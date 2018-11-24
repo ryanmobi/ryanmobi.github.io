@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><head>
+    <meta name="google-site-verification" content="" />
+    <meta name="baidu-site-verification" content="" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="Linux的包管理系统五花八门，本文主要是对主流的Linux包管理系统之间的关系进行了梳理">
+    
+    <meta name="keyword"  content="华恒, 华恒的博客, 技术的本质, 互联网, Web, 分布式系统, 高可用, 数据库, Docker, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>Linux包管理扫盲帖-技术的本质 | CodeLog Blog</title>
+
+    <link rel="canonical" href="/2016/01/14/linux-package-management/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="/css/highlight/styles/atom-one-light.css">
+
+    
+    <script src="/js/jquery.min.js"></script>
+
+    
+    <script src="/js/bootstrap.min.js"></script>
+
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    <script src="/css/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">技术的本质</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/tech">tech</a>
+                    </li>
+                    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/post-bg-coffee.jpeg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/linux" title="Linux">
+                           Linux
+                        </a>
+                        
+                    </div>
+                    <h1>Linux包管理扫盲帖</h1>
+                    <h2 class="subheading">  &#34;Linux包管理扫盲帖&#34;</h2>
+                    <span  class="meta">Posted by     &#34;华恒&#34; on Thursday, January 14, 2016
+                        
+                        <span id="/2016/01/14/linux-package-management/" class="leancloud_visitors meta_data_item" data-flag-title="">
+    <span class="post-meta-item-icon">
+      <span class="octicon octicon-eye"></span> 
+    </span>
+    <i class="fa fa-eye"></i>
+    <span class="old-visitors-count" style="display: none;"></span>
+    <span class="leancloud-visitors-count"></span>
+</span>
+
+
+
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+
+<script>
+	AV.initialize("1xUyXiB4JM5bdoQdAB9sQ2LO-gzGzoHsz", "sx2QciEmiQsoexELNH373Hcw");
+</script>
+
+<script type="text/javascript">
+function showTime(Counter) {
+    var query = new AV.Query(Counter);
+    var entries = [];
+    var $visitors = $(".leancloud_visitors");
+
+    $visitors.each(function() {
+        entries.push($(this).attr("id").trim());
+    });
+
+    query.containedIn('url', entries);
+    query.find()
+        .done(function(results) {
+            var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+            var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+
+            
+            
+            
+            
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+                var url = item.get('url');
+                var time = item.get('time');
+                var element = document.getElementById(url);
+
+                $(element).find(COUNT_CONTAINER_REF).text(time);
+            }
+            for (var i = 0; i < entries.length; i++) {
+                var url = entries[i];
+                var element = document.getElementById(url);
+                var countSpan = $(element).find(COUNT_CONTAINER_REF);
+                if (countSpan.text() == '') {
+                    var oldCountSpan = $(element).find(OLD_COUNT_CONTAINER_REF).text();
+                    if(oldCountSpan!=''){
+                        countSpan.text(0+parseInt(oldCountSpan));
+                    }else{
+                        countSpan.text(0);          
+                    }
+                }
+            }
+        })
+        .fail(function(object, error) {
+            console.log("Error: " + error.code + " " + error.message);
+        });
+}
+
+function addCount(Counter) {
+    var $visitors = $(".leancloud_visitors");
+    var url = $visitors.attr('id').trim();
+    var title = $visitors.attr('data-flag-title').trim();
+    var query = new AV.Query(Counter);
+
+    query.equalTo("url", url);
+    query.find({
+        success: function(results) {
+            if (results.length > 0) {
+                var counter = results[0];
+                counter.fetchWhenSave(true);
+                counter.increment("time");
+                counter.save(null, {
+                    success: function(counter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                    },
+                    error: function(counter, error) {
+                        console.log('Failed to save Visitor num, with error message: ' + error.message);
+                    }
+                });
+            } else {
+                var newcounter = new Counter();
+                 
+                var acl = new AV.ACL();
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                newcounter.setACL(acl);
+                 
+                newcounter.set("title", title);
+                newcounter.set("url", url);
+                var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+                var $element = $(document.getElementById(url));
+                var oldCountSpan = $element.find(OLD_COUNT_CONTAINER_REF).text();
+                if(oldCountSpan!=''){
+                    newcounter.set("time", parseInt(oldCountSpan)+1);
+                }else{
+ 	                    newcounter.set("time",  1);
+                }
+                newcounter.save(null, {
+                    success: function(newcounter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                    },
+                    error: function(newcounter, error) {
+                        console.log('Failed to create');
+                    }
+                });
+            }
+        },
+        error: function(error) {
+            console.log('Error:' + error.code + " " + error.message);
+        }
+    });
+}
+$(function() {
+    var Counter = AV.Object.extend("Counter");
+    
+    
+    if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+    } else {
+        showTime(Counter);
+    }
+});
+</script>
+
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#dpkg">dpkg</a></li>
+<li><a href="#apt-get">apt-get</a></li>
+<li><a href="#aptitude">aptitude</a></li>
+<li><a href="#rpm">rpm</a></li>
+<li><a href="#yum">yum</a></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		<p><img src="http://codelog.me/img/2016-01-14-linux-package-management/linux-package-management.png"></p>
+
+<p>简单来说，Linux <strong>包管理系统（package management）</strong> 指的是在Linux系统上安装删除或者更新软件的一种工具。不同Linux发行版本的应用软件打包格式各不相同, 譬如：Debian系列的Linux安装包格式为: *.deb; CentOS的为: *.rpm; openSUSE也是: *.rpm。 由于不同Linux发行版本安装包格式的差异性，也导致了不同Linix发行版之间包管理工具不尽相同。</p>
+
+<p>关于各种Linux发行版本之间的关系可以参照<a href="https://upload.wikimedia.org/wikipedia/commons/1/1b/Linux_Distribution_Timeline.svg">这里</a></p>
+
+<p>包管理系统也有Lower-Level跟High-Level之分，请看下面的表格：</p>
+
+<table>
+<thead>
+<tr>
+<th align="right">发行版本</th>
+<th align="left">Lower-Level</th>
+<th align="center">High-Level</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td align="right">Debian系</td>
+<td align="left">dpkg</td>
+<td align="center">apt-get/aptitude</td>
+</tr>
+
+<tr>
+<td align="right">CentOS</td>
+<td align="left">rpm</td>
+<td align="center">yum</td>
+</tr>
+
+<tr>
+<td align="right">openSUSE</td>
+<td align="left">rpm</td>
+<td align="center">zypper</td>
+</tr>
+</tbody>
+</table>
+
+<p>我们来看看它们之间具体的区别：</p>
+
+<h2 id="dpkg">dpkg</h2>
+
+<p>dpkg是基于Debian的Linux系统的底层包管理工具，它可以安装，删除，打包<strong>deb</strong> 格式的软件包，也可以用于查询deb软件包的详细信息。但是dpkg不能自动下载安装一个软件所需要的相关三方依赖包。用法如下：</p>
+
+<p>安装一个deb包：</p>
+
+<pre><code class="language-shell">＃ dpkg -i flashpluginnonfree_2.8.2+squeeze1_i386.deb
+</code></pre>
+
+<p>查看本机器安装的deb包：</p>
+
+<pre><code class="language-shell"># dpkg -l
+</code></pre>
+
+<p>更多的用法可以参考:<a href="http://www.tecmint.com/dpkg-command-examples/">这篇文章</a></p>
+
+<h2 id="apt-get">apt-get</h2>
+
+<p>apt-get 是基于Debian的Linux系统的高层包管理工具，提供了非常方便的软件包自动查找，安装，删除等一系列功能。apt-get可以自动下载安装一个软件包需要的三方依赖包。但是apt-get跟dpkg有一个不同的地方在于，apt-get<strong>不能直接用于安装deb包</strong>; 对于apt-get，只要输入包的名字，apt-get就会自动的去中心仓库查找下载并安装相应的软件包。用法如下：</p>
+
+<p>安装apache：</p>
+
+<pre><code class="language-shell"># apt-get install apache2
+</code></pre>
+
+<p>更多用法可以参考:<a href="http://www.tecmint.com/useful-basic-commands-of-apt-get-and-apt-cache-for-package-management/">这篇文章</a></p>
+
+<h2 id="aptitude">aptitude</h2>
+
+<p>aptitude 提供跟apt-get类似的功能，但aptitude比apt-get更直观，aptitude提供了图形界面，用户可以非常方便地进行相关包管理操作。</p>
+
+<p><img src="http://codelog.me/img/2016-01-14-linux-package-management/aptitude.png" /></p>
+
+<h2 id="rpm">rpm</h2>
+
+<p>rpm是Linux Standard Base（LSB)兼容的Linux系统（譬如说RHEL和CentOS）的底层包管理工具，总体来说功能跟dpkg类似。用法如下：</p>
+
+<p>安装pidpin：</p>
+
+<pre><code class="language-shell"># rpm -ivh pidgin-2.7.9-5.el6.2.i686.rpm
+</code></pre>
+
+<p>更多用法可以参考：<a href="http://www.tecmint.com/20-practical-examples-of-rpm-commands-in-linux/">这篇文章</a></p>
+
+<h2 id="yum">yum</h2>
+
+<p>yum在rpm的基础上提供高层包管理功能，功能与apt-get类似。用法如下：</p>
+
+<p>安装firefox:</p>
+
+<pre><code class="language-shell"># yum install firefox
+</code></pre>
+
+<p>更多用法可以参考：<a href="http://www.tecmint.com/20-linux-yum-yellowdog-updater-modified-commands-for-package-mangement/">这篇文章</a></p>
+
+<p>综上所述，本文只是对Linux系列包管理工具的入门扫盲介绍，大部分内容参考了<a href="http://www.tecmint.com/linux-package-management/">这篇文章</a>，目的是为了提供一个快速参考手册。</p>
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/2017/04/12/sql-join-in-detail/" data-toggle="tooltip" data-placement="top" title="图说SQL Join">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/2016/01/13/where-the-package-installed-in-linux/" data-toggle="tooltip" data-placement="top" title="deb包安装目录详解">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                            <a href="/tags/java" title="java">
+                                java
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/jboss" title="jboss">
+                                jboss
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/linux" title="linux">
+                                linux
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/shell" title="shell">
+                                shell
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/sql" title="sql">
+                                sql
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F" title="分布式">
+                                分布式
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E7%AE%97%E6%B3%95" title="算法">
+                                算法
+                            </a>
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="技术的本质" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:gdlujianhua@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/img/wechat_qrcode.png">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 技术的本质 , 2016
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+<script>
+    
+    var _baId = 'c63aaee580fed094fa8dae6b8b6999e6';
+
+    
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+</body>
+</html>

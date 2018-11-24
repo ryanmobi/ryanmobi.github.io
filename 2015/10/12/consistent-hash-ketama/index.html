@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><head>
+    <meta name="google-site-verification" content="" />
+    <meta name="baidu-site-verification" content="" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="一致性哈希算法在互联网中有广泛的应用，相对来说，一致性哈希算法的原理还是比较容易理解的，但在日常开发过程中发现虽然大部分同事对一致性哈希算法的原理有个大概的认识，然而能知道该算法具体实现的人却寥寥无几。">
+    
+    <meta name="keyword"  content="华恒, 华恒的博客, 技术的本质, 互联网, Web, 分布式系统, 高可用, 数据库, Docker, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>一致性哈希算法之Ketama算法-技术的本质 | CodeLog Blog</title>
+
+    <link rel="canonical" href="/2015/10/12/consistent-hash-ketama/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="/css/highlight/styles/atom-one-light.css">
+
+    
+    <script src="/js/jquery.min.js"></script>
+
+    
+    <script src="/js/bootstrap.min.js"></script>
+
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    <script src="/css/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">技术的本质</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/tech">tech</a>
+                    </li>
+                    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/post-bg-coffee.jpeg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/%E7%AE%97%E6%B3%95" title="算法">
+                           算法
+                        </a>
+                        
+                       <a class="tag" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F" title="分布式">
+                           分布式
+                        </a>
+                        
+                    </div>
+                    <h1>一致性哈希算法之Ketama算法</h1>
+                    <h2 class="subheading">  &#34;一致性哈希算法之Ketama算法&#34;</h2>
+                    <span  class="meta">Posted by     &#34;华恒&#34; on Monday, October 12, 2015
+                        
+                        <span id="/2015/10/12/consistent-hash-ketama/" class="leancloud_visitors meta_data_item" data-flag-title="">
+    <span class="post-meta-item-icon">
+      <span class="octicon octicon-eye"></span> 
+    </span>
+    <i class="fa fa-eye"></i>
+    <span class="old-visitors-count" style="display: none;"></span>
+    <span class="leancloud-visitors-count"></span>
+</span>
+
+
+
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+
+<script>
+	AV.initialize("1xUyXiB4JM5bdoQdAB9sQ2LO-gzGzoHsz", "sx2QciEmiQsoexELNH373Hcw");
+</script>
+
+<script type="text/javascript">
+function showTime(Counter) {
+    var query = new AV.Query(Counter);
+    var entries = [];
+    var $visitors = $(".leancloud_visitors");
+
+    $visitors.each(function() {
+        entries.push($(this).attr("id").trim());
+    });
+
+    query.containedIn('url', entries);
+    query.find()
+        .done(function(results) {
+            var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+            var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+
+            
+            
+            
+            
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+                var url = item.get('url');
+                var time = item.get('time');
+                var element = document.getElementById(url);
+
+                $(element).find(COUNT_CONTAINER_REF).text(time);
+            }
+            for (var i = 0; i < entries.length; i++) {
+                var url = entries[i];
+                var element = document.getElementById(url);
+                var countSpan = $(element).find(COUNT_CONTAINER_REF);
+                if (countSpan.text() == '') {
+                    var oldCountSpan = $(element).find(OLD_COUNT_CONTAINER_REF).text();
+                    if(oldCountSpan!=''){
+                        countSpan.text(0+parseInt(oldCountSpan));
+                    }else{
+                        countSpan.text(0);          
+                    }
+                }
+            }
+        })
+        .fail(function(object, error) {
+            console.log("Error: " + error.code + " " + error.message);
+        });
+}
+
+function addCount(Counter) {
+    var $visitors = $(".leancloud_visitors");
+    var url = $visitors.attr('id').trim();
+    var title = $visitors.attr('data-flag-title').trim();
+    var query = new AV.Query(Counter);
+
+    query.equalTo("url", url);
+    query.find({
+        success: function(results) {
+            if (results.length > 0) {
+                var counter = results[0];
+                counter.fetchWhenSave(true);
+                counter.increment("time");
+                counter.save(null, {
+                    success: function(counter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                    },
+                    error: function(counter, error) {
+                        console.log('Failed to save Visitor num, with error message: ' + error.message);
+                    }
+                });
+            } else {
+                var newcounter = new Counter();
+                 
+                var acl = new AV.ACL();
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                newcounter.setACL(acl);
+                 
+                newcounter.set("title", title);
+                newcounter.set("url", url);
+                var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+                var $element = $(document.getElementById(url));
+                var oldCountSpan = $element.find(OLD_COUNT_CONTAINER_REF).text();
+                if(oldCountSpan!=''){
+                    newcounter.set("time", parseInt(oldCountSpan)+1);
+                }else{
+ 	                    newcounter.set("time",  1);
+                }
+                newcounter.save(null, {
+                    success: function(newcounter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                    },
+                    error: function(newcounter, error) {
+                        console.log('Failed to create');
+                    }
+                });
+            }
+        },
+        error: function(error) {
+            console.log('Error:' + error.code + " " + error.message);
+        }
+    });
+}
+$(function() {
+    var Counter = AV.Object.extend("Counter");
+    
+    
+    if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+    } else {
+        showTime(Counter);
+    }
+});
+</script>
+
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        
+        		
+        		<p>有关一致性哈希算法原理及其应用讨论的文章已经足够多，如果对一致性哈希算法一点概念都没有的同学可以先参考这篇文章：<a href="http://blog.codinglabs.org/articles/consistent-hashing.html" title="一致性哈希">一致性哈希</a>。</p>
+
+<p>相对来说，一致性哈希算法的原理还是比较容易理解的，但在日常开发过程中发现虽然大部分同事对一致性哈希算法的原理有个大概的认识，然而能知道该算法具体实现的人却寥寥无几。当然一致性哈希算法的实现不同语言有不同的实现方式，其中较为有名的一种实现叫Ketama算法，该算法最初是由<a href="http://www.last.fm/" title="last.fm">Last.fm</a>的程序员实现的并得到了广泛的应用，一些开源框架譬如spymemcached，twemproxy等都内置了该算法的实现。</p>
+
+<p>本文主要从spymemcached的源码出发，分析Ketama算法的具体实现。</p>
+
+<p>在类KetamaNodeLocator.java里有个setKetamaNodes（）方法负责一致性哈希环的初始化工作， 代码如下：</p>
+
+<pre><code class="language-java">protected void setKetamaNodes(List&lt;MemcachedNode&gt; nodes) {
+    TreeMap&lt;Long, MemcachedNode&gt; newNodeMap = new TreeMap&lt;Long, MemcachedNode&gt;();
+    int numReps = config.getNodeRepetitions();
+
+    for (MemcachedNode node : nodes) {
+      // Ketama does some special work with md5 where it reuses chunks.
+      if (hashAlg == DefaultHashAlgorithm.KETAMA_HASH) {
+        for (int i = 0; i &lt; numReps / 4; i++) {
+          byte[] digest = DefaultHashAlgorithm.computeMd5(config.getKeyForNode(node, i));
+          for (int h = 0; h &lt; 4; h++) {
+            Long k = ((long) (digest[3 + h * 4] &amp; 0xFF) &lt;&lt; 24)
+                    | ((long) (digest[2 + h * 4] &amp; 0xFF) &lt;&lt; 16)
+                    | ((long) (digest[1 + h * 4] &amp; 0xFF) &lt;&lt; 8)
+                    | (digest[h * 4] &amp; 0xFF);
+
+            newNodeMap.put(k, node);
+            getLogger().debug(&quot;Adding node %s in position %d&quot;, node, k);
+          }
+        }
+      } else {
+        for (int i = 0; i &lt; numReps; i++) {
+          newNodeMap.put(hashAlg.hash(config.getKeyForNode(node, i)), node);
+        }
+      }
+    }
+    assert newNodeMap.size() == numReps * nodes.size();
+    ketamaNodes = newNodeMap;
+}
+</code></pre>
+
+<p>下面我们来具体分析下setKetamaNodes函数的实现，首先MemcachedNode这个类对Memcached节点的网络连接参数及方法进行了封装。TreeMap在这里用于模拟一致性哈希环的环状结构。</p>
+
+<pre><code class="language-java">int numReps = config.getNodeRepetitions();
+</code></pre>
+
+<p><strong>getNodeRepetitions()</strong> 方法负责读取配置信息，返回一个真实的Memcached节点对应的虚拟节点数，默认情况下返回160，也就是说一个Memcached节点在一致性哈希环上对应有160个虚拟节点。</p>
+
+<pre><code class="language-java">config.getKeyForNode(node, i)
+</code></pre>
+
+<p><strong>getKeyForNode()</strong> 根据传进去的MemcacheNode对象和变量i生成key值，返回值示例：“127.0.0.1:11311-0”</p>
+
+<p><strong>computeMd5()</strong> 根据key生成16位的MD5摘要， 因此digest数组共16位:</p>
+
+<pre><code class="language-java">byte[] digest = DefaultHashAlgorithm.computeMd5(config.getKeyForNode(node, i));
+</code></pre>
+
+<p>将digest数组按每四位一组，通过位操作产生一个最大32位的长整数。之所以是32位是因为一致性哈希环取值范围为0～2^32; 回到上面的例子，对于一个Memcached节点譬如“127.0.0.1:11311”, 将通过for循环产生“127.0.0.1:11311-0”，“127.0.0.1:11311-1”&hellip; “127.0.0.1:11311-39”共40个副本，对于每个副本譬如“127.0.0.1:11311-0”, 将会产生4个长整数，对应一致性哈希环上的4个位置，所以默认配置的情况下，一个Memcached节点将在一致性哈希环上占据4×40=160个位置。</p>
+
+<pre><code class="language-java">Long k = ((long) (digest[3 + h * 4] &amp; 0xFF) &lt;&lt; 24)
+          | ((long) (digest[2 + h * 4] &amp; 0xFF) &lt;&lt; 16)
+          | ((long) (digest[1 + h * 4] &amp; 0xFF) &lt;&lt; 8)
+          | (digest[h * 4] &amp; 0xFF);
+</code></pre>
+
+<p>以k为key将MemcacheNode对象放到TreeMap里：</p>
+
+<pre><code class="language-java">newNodeMap.put(k, node);
+</code></pre>
+
+<p>由于TreeMap中的value是按Key排序的，因此可以通过TreeMap来模拟一致性哈希的环状结构，k值小的排在前，k值大的排在后。</p>
+
+<p>以上就是一致性哈希环初始化过程的的基本分析，下面我们来看看查询的过程， getPrimary()函数传入一个key，譬如&rdquo;123&rdquo;, 先计算出该key的哈希值。</p>
+
+<pre><code class="language-java">public MemcachedNode getPrimary(final String k) {
+    MemcachedNode rv = getNodeForKey(hashAlg.hash(k));
+    assert rv != null : &quot;Found no node for key &quot; + k;
+    return rv;
+  }
+
+MemcachedNode getNodeForKey(long hash) {
+	final MemcachedNode rv;
+	if (!ketamaNodes.containsKey(hash)) {
+	  // Java 1.6 adds a ceilingKey method, but I'm still stuck in 1.5
+	  // in a lot of places, so I'm doing this myself.
+	  SortedMap&lt;Long, MemcachedNode&gt; tailMap = getKetamaNodes().tailMap(hash);
+	  if (tailMap.isEmpty()) {
+	    hash = getKetamaNodes().firstKey();
+	  } else {
+	    hash = tailMap.firstKey();
+	  }
+	}
+	rv = getKetamaNodes().get(hash);
+	return rv;
+}
+</code></pre>
+
+<p>重点在于下面这句, TreeMap的tailMap()方法会返回一个SortedMap对象tailMap, tailMap中包含的所有key值都比传参hash大，这个操作相当于给定一个hash值，从一致性哈希环中按顺时针顺序查找节点，直到查找到第一个key值比传参hash大的节点，该节点就是该hash值所对应的Memcached节点。</p>
+
+<pre><code class="language-java">SortedMap&lt;Long, MemcachedNode&gt; tailMap = getKetamaNodes().tailMap(hash);
+</code></pre>
+
+<p>以上就是对Sypmencached源码中Ketama算法的实现分析。</p>
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/2016/01/13/where-the-package-installed-in-linux/" data-toggle="tooltip" data-placement="top" title="deb包安装目录详解">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/2015/09/13/java-hashcode/" data-toggle="tooltip" data-placement="top" title="hashCode()的实现细节">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                            <a href="/tags/java" title="java">
+                                java
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/jboss" title="jboss">
+                                jboss
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/linux" title="linux">
+                                linux
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/shell" title="shell">
+                                shell
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/sql" title="sql">
+                                sql
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F" title="分布式">
+                                分布式
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E7%AE%97%E6%B3%95" title="算法">
+                                算法
+                            </a>
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="技术的本质" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:gdlujianhua@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/img/wechat_qrcode.png">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 技术的本质 , 2015
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+<script>
+    
+    var _baId = 'c63aaee580fed094fa8dae6b8b6999e6';
+
+    
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+</body>
+</html>

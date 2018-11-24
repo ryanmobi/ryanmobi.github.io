@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tech on 技术的本质</title>
+    <link>http://codelog.me/categories/tech/</link>
+    <description>Recent content in Tech on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 12 Apr 2017 23:15:36 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/categories/tech/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>图说SQL Join</title>
+      <link>http://codelog.me/2017/04/12/sql-join-in-detail/</link>
+      <pubDate>Wed, 12 Apr 2017 23:15:36 +0000</pubDate>
+      
+      <guid>http://codelog.me/2017/04/12/sql-join-in-detail/</guid>
+      <description>&lt;p&gt;如果你也曾经被SQL语言中各种Join操作：Left Join, Right Join, Inner Join等搞晕了头，那么这篇文章比较适合你。本文通过维恩图演示各种Join语句的执行效果，简单直白容易记忆。&lt;a href=&#34;https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/&#34;&gt;原文见&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;假如有两张表 &lt;strong&gt;Table A&lt;/strong&gt; 和 &lt;strong&gt;Table B&lt;/strong&gt;, 表数据如下:
+Table A:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;id&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Pirate&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Monkey&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Ninja&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Spaghetti&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Table B:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;id&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Rutabaga&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Pirate&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Darth Vader&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Ninja&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;下面我们来看看各种Join的执行效果&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Linux包管理扫盲帖</title>
+      <link>http://codelog.me/2016/01/14/linux-package-management/</link>
+      <pubDate>Thu, 14 Jan 2016 23:43:47 +0000</pubDate>
+      
+      <guid>http://codelog.me/2016/01/14/linux-package-management/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://codelog.me/img/2016-01-14-linux-package-management/linux-package-management.png&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;简单来说，Linux &lt;strong&gt;包管理系统（package management）&lt;/strong&gt; 指的是在Linux系统上安装删除或者更新软件的一种工具。不同Linux发行版本的应用软件打包格式各不相同, 譬如：Debian系列的Linux安装包格式为: *.deb; CentOS的为: *.rpm; openSUSE也是: *.rpm。 由于不同Linux发行版本安装包格式的差异性，也导致了不同Linix发行版之间包管理工具不尽相同。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>deb包安装目录详解</title>
+      <link>http://codelog.me/2016/01/13/where-the-package-installed-in-linux/</link>
+      <pubDate>Wed, 13 Jan 2016 00:13:58 +0000</pubDate>
+      
+      <guid>http://codelog.me/2016/01/13/where-the-package-installed-in-linux/</guid>
+      <description>&lt;p&gt;大家都知道在Windows系统下安装一个软件，一般情况下该软件包的绝大部分文件都保存在安装目录里，但刚开始在Linux上安装了一个软件包，往往心中会有一个疑问，&lt;strong&gt;究竟软件包的文件被保存到在里？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;其实在Linux里安装软件包，系统会将软件包里不同类型的文件拷贝到不同的目录。如果你是用Debian系列的Linux系统，可以通过以下命令找出一个软件包不同类型文件所在的目录，举个例子，要查看nodejs的所有文件的分布情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;# dpkg -L nodejs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出如下：&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>一致性哈希算法之Ketama算法</title>
+      <link>http://codelog.me/2015/10/12/consistent-hash-ketama/</link>
+      <pubDate>Mon, 12 Oct 2015 23:38:54 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/10/12/consistent-hash-ketama/</guid>
+      <description>&lt;p&gt;有关一致性哈希算法原理及其应用讨论的文章已经足够多，如果对一致性哈希算法一点概念都没有的同学可以先参考这篇文章：&lt;a href=&#34;http://blog.codinglabs.org/articles/consistent-hashing.html&#34; title=&#34;一致性哈希&#34;&gt;一致性哈希&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;相对来说，一致性哈希算法的原理还是比较容易理解的，但在日常开发过程中发现虽然大部分同事对一致性哈希算法的原理有个大概的认识，然而能知道该算法具体实现的人却寥寥无几。当然一致性哈希算法的实现不同语言有不同的实现方式，其中较为有名的一种实现叫Ketama算法，该算法最初是由&lt;a href=&#34;http://www.last.fm/&#34; title=&#34;last.fm&#34;&gt;Last.fm&lt;/a&gt;的程序员实现的并得到了广泛的应用，一些开源框架譬如spymemcached，twemproxy等都内置了该算法的实现。&lt;/p&gt;
+
+&lt;p&gt;本文主要从spymemcached的源码出发，分析Ketama算法的具体实现。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>hashCode()的实现细节</title>
+      <link>http://codelog.me/2015/09/13/java-hashcode/</link>
+      <pubDate>Sun, 13 Sep 2015 22:32:31 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/09/13/java-hashcode/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://codelog.me/img/2015-09-13-about-hashcode/658px-Setzkasten.jpg&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;图片来源:&lt;/em&gt;&lt;a href=&#34;https://commons.wikimedia.org/wiki/File:Setzkasten.jpg&#34;&gt;维基百科&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Java 中以0开头的int变量的真实值</title>
+      <link>http://codelog.me/2015/03/10/java-octal-int/</link>
+      <pubDate>Tue, 10 Mar 2015 17:54:32 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/03/10/java-octal-int/</guid>
+      <description>&lt;p&gt;今天在leetcode上做题的时候无意中发现下面这个问题：&lt;/p&gt;
+
+&lt;p&gt;请问下面的Java语句输出的是什么值？&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;System.out.println(00123);
+System.out.println(0_123);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;答案是：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;83
+83
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>深入理解Java String.intern() 内存模型</title>
+      <link>http://codelog.me/2015/01/20/java-string-intern/</link>
+      <pubDate>Tue, 20 Jan 2015 14:05:51 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/20/java-string-intern/</guid>
+      <description>&lt;p&gt;大家知道，Java中string.intern()方法调用会先去字符串常量池中查找相应的字符串，如果字符串不存在，就会在字符串常量池中创建该字符串然后再返回。&lt;/p&gt;
+
+&lt;p&gt;字符串常量池是一个固定大小的HashMap，桶的数量默认是1009, 从Java7u40开始，该默认值增大到60013。在Java6当中，字符串常量池是放在Perm空间的，从Java7开始，字符串常量池被移到Heap空间。下面，我们通过测试程序来窥探字符串常量池在Java6，Java7两个不同版本底下的内存分配情况。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Jboss AS7 类加载机制</title>
+      <link>http://codelog.me/2015/01/15/jboss-as7-class-loading/</link>
+      <pubDate>Thu, 15 Jan 2015 11:05:51 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/15/jboss-as7-class-loading/</guid>
+      <description>&lt;p&gt;相对于Jboss之前的版本，AS7的类加载机制完全不同，AS7的类加载是基于JBoss模块来设计，关于JBoss模块的介绍，可以看上一篇文章&lt;a href=&#34;http://m.com&#34; title=&#34;Jboss模块介绍&#34;&gt;Jboss模块介绍&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;隐式模块依赖&#34;&gt;隐式模块依赖&lt;/h1&gt;
+
+&lt;p&gt;当你部署一个应用到Jboss容器的时候，有些依赖是隐式被加载的，例如如果部署一个Java EE的应用，包含EJBs，因为EJBs需要用到Javax.ejb.* 的包和其他一些Java EE API 相关包，包含这些包的Jar已经预先被制作成Module并且默认包含在容器里头作为JBoss AS的一部分，那么这些Jar的模块将会被自动加载。&lt;/p&gt;
+
+&lt;p&gt;那么隐式模块依赖是什么时候被加载的呢？当一个应用部署到容器里头，会经过一条叫做“deployment processors”的链。这条链上的每个processor都有方法去检测这个应用是否需要隐式加载一些模块，如果是，就将相关的依赖加载进来。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Jboss AS7 模块介绍</title>
+      <link>http://codelog.me/2015/01/13/jboss-as7-module-introduce/</link>
+      <pubDate>Tue, 13 Jan 2015 16:27:00 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/13/jboss-as7-module-introduce/</guid>
+      <description>&lt;p&gt;相对于Jboss之前的版本，AS7的类加载机制完全不同，AS7的类加载是基于JBoss模块来设计的。&lt;/p&gt;
+
+&lt;p&gt;#什么是模块
+模块是classes和resources的集合，每一个模块对应着一个classloader。模块之间可以存在依赖关系，如果一个模块里面的Jar包需要用到另一个模块Jar包里面的类，那么需要显式声明模块依赖，否则模块与模块之间是不可见的。同样，如果部署一个应用到JBoss AS7容器，应用需要依赖模块，也要显式声明模块依赖。&lt;/p&gt;
+
+&lt;p&gt;如果要深入了解JBoss AS7模块加载的机制，可以看：&lt;a href=&#34;http://jaxenter.com/inside-the-jboss-as-7modularity-107386.html&#34; title=&#34;JBoss模块分析&#34;&gt;JBoss模块分析&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;#模块的好处
+1. 相同版本的Jar包不会被重复加载。
+2. 避免Jar包的版本冲突问题。
+3. 提供了更加高效的类加载机制。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>sed快速入门</title>
+      <link>http://codelog.me/2014/01/23/sed-quick-start/</link>
+      <pubDate>Thu, 23 Jan 2014 23:53:51 +0800</pubDate>
+      
+      <guid>http://codelog.me/2014/01/23/sed-quick-start/</guid>
+      <description>sed与awk堪称文本流处理神器，本文提供了sed命令的快速入门参考：
+删除命令 删除第N行 sed 3d abc.txt  该命令会删除第三行数据
+隔行删除 sed &#39;1~2d&#39; abc.txt sed &#39;2~2d&#39; abc.txt  第一个命令会删除奇数行数据，第二个命令会删除偶数行数据。
+删除从N行开始到M行的数据 sed &#39;5,11d&#39; abc.txt  删除第五行到第十一行的数据。
+删除最后一行数据 sed &#39;$d&#39; abc.txt  删除符合条件的行 sed /unix/d abc.txt  该命令会删除所有包含unix关键字的行
+删除符合条件的行以及紧跟着的N行 sed &#39;/unix/,+3d&#39; abc.txt  该命令会删除包含unix关键字的行以及该行往下3行
+删除符合条件的行到最后的行 sed &#39;/unix/,$d&#39; abc.txt  该命令会删除包含unix关键字的行以及该行往下到文件结尾的所有行
+删除所有空行 sed &#39;/^$/d&#39; abc.txt  该命令会删除abc.txt所有空白行
+删除所有注释行 我们这里假设通过符号 # 来进行注释
+sed &#39;/#.*/d&#39; abc.txt  该命令会删除所有注释行
+替换命令 s 代表替换符, / 是定界符
+单个替换 sed &#39;s/old/new/&#39;  该命令会将第一个&amp;rsquo;old&amp;rsquo;替换成&amp;rsquo;new&amp;rsquo;</description>
+    </item>
+    
+  </channel>
+</rss>

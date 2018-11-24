@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>分布式 on 技术的本质</title>
+    <link>http://codelog.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F/</link>
+    <description>Recent content in 分布式 on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Mon, 12 Oct 2015 23:38:54 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>一致性哈希算法之Ketama算法</title>
+      <link>http://codelog.me/2015/10/12/consistent-hash-ketama/</link>
+      <pubDate>Mon, 12 Oct 2015 23:38:54 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/10/12/consistent-hash-ketama/</guid>
+      <description>&lt;p&gt;有关一致性哈希算法原理及其应用讨论的文章已经足够多，如果对一致性哈希算法一点概念都没有的同学可以先参考这篇文章：&lt;a href=&#34;http://blog.codinglabs.org/articles/consistent-hashing.html&#34; title=&#34;一致性哈希&#34;&gt;一致性哈希&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;相对来说，一致性哈希算法的原理还是比较容易理解的，但在日常开发过程中发现虽然大部分同事对一致性哈希算法的原理有个大概的认识，然而能知道该算法具体实现的人却寥寥无几。当然一致性哈希算法的实现不同语言有不同的实现方式，其中较为有名的一种实现叫Ketama算法，该算法最初是由&lt;a href=&#34;http://www.last.fm/&#34; title=&#34;last.fm&#34;&gt;Last.fm&lt;/a&gt;的程序员实现的并得到了广泛的应用，一些开源框架譬如spymemcached，twemproxy等都内置了该算法的实现。&lt;/p&gt;
+
+&lt;p&gt;本文主要从spymemcached的源码出发，分析Ketama算法的具体实现。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

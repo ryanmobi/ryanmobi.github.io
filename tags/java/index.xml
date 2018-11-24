@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Java on 技术的本质</title>
+    <link>http://codelog.me/tags/java/</link>
+    <description>Recent content in Java on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 13 Sep 2015 22:32:31 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/java/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>hashCode()的实现细节</title>
+      <link>http://codelog.me/2015/09/13/java-hashcode/</link>
+      <pubDate>Sun, 13 Sep 2015 22:32:31 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/09/13/java-hashcode/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://codelog.me/img/2015-09-13-about-hashcode/658px-Setzkasten.jpg&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;图片来源:&lt;/em&gt;&lt;a href=&#34;https://commons.wikimedia.org/wiki/File:Setzkasten.jpg&#34;&gt;维基百科&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Java 中以0开头的int变量的真实值</title>
+      <link>http://codelog.me/2015/03/10/java-octal-int/</link>
+      <pubDate>Tue, 10 Mar 2015 17:54:32 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/03/10/java-octal-int/</guid>
+      <description>&lt;p&gt;今天在leetcode上做题的时候无意中发现下面这个问题：&lt;/p&gt;
+
+&lt;p&gt;请问下面的Java语句输出的是什么值？&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-java&#34;&gt;System.out.println(00123);
+System.out.println(0_123);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;答案是：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;83
+83
+&lt;/code&gt;&lt;/pre&gt;</description>
+    </item>
+    
+    <item>
+      <title>深入理解Java String.intern() 内存模型</title>
+      <link>http://codelog.me/2015/01/20/java-string-intern/</link>
+      <pubDate>Tue, 20 Jan 2015 14:05:51 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/20/java-string-intern/</guid>
+      <description>&lt;p&gt;大家知道，Java中string.intern()方法调用会先去字符串常量池中查找相应的字符串，如果字符串不存在，就会在字符串常量池中创建该字符串然后再返回。&lt;/p&gt;
+
+&lt;p&gt;字符串常量池是一个固定大小的HashMap，桶的数量默认是1009, 从Java7u40开始，该默认值增大到60013。在Java6当中，字符串常量池是放在Perm空间的，从Java7开始，字符串常量池被移到Heap空间。下面，我们通过测试程序来窥探字符串常量池在Java6，Java7两个不同版本底下的内存分配情况。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

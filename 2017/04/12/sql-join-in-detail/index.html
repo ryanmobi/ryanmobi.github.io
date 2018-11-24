@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><head>
+    <meta name="google-site-verification" content="" />
+    <meta name="baidu-site-verification" content="" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="做数据分析的时候，往往需要联合多张数据表进行各种Join操作，SQL语言中的各种Join语句比较难记，本文通过图表的方式将Join操作更直观地进行解释，也能更容易理解和记忆。">
+    
+    <meta name="keyword"  content="华恒, 华恒的博客, 技术的本质, 互联网, Web, 分布式系统, 高可用, 数据库, Docker, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>图说SQL Join-技术的本质 | CodeLog Blog</title>
+
+    <link rel="canonical" href="/2017/04/12/sql-join-in-detail/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="/css/highlight/styles/atom-one-light.css">
+
+    
+    <script src="/js/jquery.min.js"></script>
+
+    
+    <script src="/js/bootstrap.min.js"></script>
+
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    <script src="/css/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">技术的本质</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/tech">tech</a>
+                    </li>
+                    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/post-bg-coffee.jpeg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/sql" title="SQL">
+                           SQL
+                        </a>
+                        
+                    </div>
+                    <h1>图说SQL Join</h1>
+                    <h2 class="subheading">  &#34;SQL Join的Venn图例解释&#34;</h2>
+                    <span  class="meta">Posted by     &#34;华恒&#34; on Wednesday, April 12, 2017
+                        
+                        <span id="/2017/04/12/sql-join-in-detail/" class="leancloud_visitors meta_data_item" data-flag-title="">
+    <span class="post-meta-item-icon">
+      <span class="octicon octicon-eye"></span> 
+    </span>
+    <i class="fa fa-eye"></i>
+    <span class="old-visitors-count" style="display: none;"></span>
+    <span class="leancloud-visitors-count"></span>
+</span>
+
+
+
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+
+<script>
+	AV.initialize("1xUyXiB4JM5bdoQdAB9sQ2LO-gzGzoHsz", "sx2QciEmiQsoexELNH373Hcw");
+</script>
+
+<script type="text/javascript">
+function showTime(Counter) {
+    var query = new AV.Query(Counter);
+    var entries = [];
+    var $visitors = $(".leancloud_visitors");
+
+    $visitors.each(function() {
+        entries.push($(this).attr("id").trim());
+    });
+
+    query.containedIn('url', entries);
+    query.find()
+        .done(function(results) {
+            var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+            var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+
+            
+            
+            
+            
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+                var url = item.get('url');
+                var time = item.get('time');
+                var element = document.getElementById(url);
+
+                $(element).find(COUNT_CONTAINER_REF).text(time);
+            }
+            for (var i = 0; i < entries.length; i++) {
+                var url = entries[i];
+                var element = document.getElementById(url);
+                var countSpan = $(element).find(COUNT_CONTAINER_REF);
+                if (countSpan.text() == '') {
+                    var oldCountSpan = $(element).find(OLD_COUNT_CONTAINER_REF).text();
+                    if(oldCountSpan!=''){
+                        countSpan.text(0+parseInt(oldCountSpan));
+                    }else{
+                        countSpan.text(0);          
+                    }
+                }
+            }
+        })
+        .fail(function(object, error) {
+            console.log("Error: " + error.code + " " + error.message);
+        });
+}
+
+function addCount(Counter) {
+    var $visitors = $(".leancloud_visitors");
+    var url = $visitors.attr('id').trim();
+    var title = $visitors.attr('data-flag-title').trim();
+    var query = new AV.Query(Counter);
+
+    query.equalTo("url", url);
+    query.find({
+        success: function(results) {
+            if (results.length > 0) {
+                var counter = results[0];
+                counter.fetchWhenSave(true);
+                counter.increment("time");
+                counter.save(null, {
+                    success: function(counter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                    },
+                    error: function(counter, error) {
+                        console.log('Failed to save Visitor num, with error message: ' + error.message);
+                    }
+                });
+            } else {
+                var newcounter = new Counter();
+                 
+                var acl = new AV.ACL();
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                newcounter.setACL(acl);
+                 
+                newcounter.set("title", title);
+                newcounter.set("url", url);
+                var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+                var $element = $(document.getElementById(url));
+                var oldCountSpan = $element.find(OLD_COUNT_CONTAINER_REF).text();
+                if(oldCountSpan!=''){
+                    newcounter.set("time", parseInt(oldCountSpan)+1);
+                }else{
+ 	                    newcounter.set("time",  1);
+                }
+                newcounter.save(null, {
+                    success: function(newcounter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                    },
+                    error: function(newcounter, error) {
+                        console.log('Failed to create');
+                    }
+                });
+            }
+        },
+        error: function(error) {
+            console.log('Error:' + error.code + " " + error.message);
+        }
+    });
+}
+$(function() {
+    var Counter = AV.Object.extend("Counter");
+    
+    
+    if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+    } else {
+        showTime(Counter);
+    }
+});
+</script>
+
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li>
+<ul>
+<li><a href="#1-inner-join">1. INNER JOIN</a></li>
+<li><a href="#2-full-join">2. Full JOIN</a></li>
+<li><a href="#3-left-join">3. LEFT JOIN</a></li>
+<li><a href="#4-right-join">4. RIGHT JOIN</a></li>
+</ul></li>
+</ul>
+</nav>
+        		
+        		<p>如果你也曾经被SQL语言中各种Join操作：Left Join, Right Join, Inner Join等搞晕了头，那么这篇文章比较适合你。本文通过维恩图演示各种Join语句的执行效果，简单直白容易记忆。<a href="https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/">原文见</a></p>
+
+<p>假如有两张表 <strong>Table A</strong> 和 <strong>Table B</strong>, 表数据如下:
+Table A:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Pirate</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Monkey</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Ninja</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Spaghetti</td>
+</tr>
+</tbody>
+</table>
+
+<p>Table B:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Rutabaga</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Pirate</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Darth Vader</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Ninja</td>
+</tr>
+</tbody>
+</table>
+
+<p>下面我们来看看各种Join的执行效果</p>
+
+<h2 id="1-inner-join">1. INNER JOIN</h2>
+
+<p>Inner Join会根据Join的On条件拿左表（Table A）的行与右表(Table B)的行进行匹配, 只有当左右表中 <strong>至少同时</strong> 存在一条匹配数据时才返回到结果集. 也就是说Inner Join求的是两个表之间的交集.</p>
+
+<pre><code class="language-SQL">SELECT * FROM TableA
+INNER JOIN TableB
+ON TableA.name = TableB.name
+</code></pre>
+
+<p>结果集:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Pirate</td>
+<td>2</td>
+<td>Pirate</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Ninja</td>
+<td>4</td>
+<td>Ninja</td>
+</tr>
+</tbody>
+</table>
+
+<p><img width="400" height="400" src="http://codelog.me/img/2017-04/inner-join.png" /></p>
+
+<h2 id="2-full-join">2. Full JOIN</h2>
+
+<p>在某些数据库中, FULL JOIN被称之为FULL OUTER JOIN (<strong>注意: MySQL不支持带ON条件的FULL JOIN, 也不支持FULL OUTER JOIN关键字</strong>).  FULL OUTER JOIN关键字会从左表(Table A)和右表(Table B)中返回所有符合条件的行, 如果Table A中的行在Table B中没有匹配或者Table B中的行在Table A中没有匹配, 则相关列返回NULL.</p>
+
+<pre><code class="language-SQL">SELECT * FROM TableA
+FULL OUTER JOIN TableB
+ON TableA.name = TableB.name
+</code></pre>
+
+<p>结果集:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Pirate</td>
+<td>2</td>
+<td>Pirate</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Monkey</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Ninja</td>
+<td>4</td>
+<td>Ninja</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Spaghetti</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>null</td>
+<td>null</td>
+<td>1</td>
+<td>Rutabaga</td>
+</tr>
+
+<tr>
+<td>null</td>
+<td>null</td>
+<td>3</td>
+<td>Darth Vader</td>
+</tr>
+</tbody>
+</table>
+
+<p><img width="400" height="400" src="http://codelog.me/img/2017-04/outer-join-1.png" /></p>
+
+<p>另外一个例子：</p>
+
+<pre><code class="language-SQL">SELECT * FROM TableA
+FULL OUTER JOIN TableB
+ON TableA.name = TableB.name
+WHERE TableA.id IS null
+OR TableB.id IS null
+</code></pre>
+
+<p>结果集:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2</td>
+<td>Monkey</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Spaghetti</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>null</td>
+<td>null</td>
+<td>1</td>
+<td>Rutabaga</td>
+</tr>
+
+<tr>
+<td>null</td>
+<td>null</td>
+<td>3</td>
+<td>Darth Vader</td>
+</tr>
+</tbody>
+</table>
+
+<p><img width="400" height="400" src="http://codelog.me/img/2017-04/outer-join-2.png" /></p>
+
+<h2 id="3-left-join">3. LEFT JOIN</h2>
+
+<p>LEFT JOIN在某些数据库中称之为LEFT OUTER JOIN. 该关键字会从左表中返回所有符合条件的行, 并且如果右表有匹配的行则一并返回, 如果右表中没找到匹配的行, 则与右表相关的结果列返回NULL</p>
+
+<pre><code class="language-SQL">SELECT * FROM TableA
+LEFT OUTER JOIN TableB
+ON TableA.name = TableB.name
+</code></pre>
+
+<p>结果集:</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>1</td>
+<td>Pirate</td>
+<td>2</td>
+<td>Pirate</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Monkey</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Ninja</td>
+<td>4</td>
+<td>Ninja</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Spaghetti</td>
+<td>null</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+
+<p><img width="400" height="400" src="http://codelog.me/img/2017-04/left-join-1.png" /></p>
+
+<p>另外一个例子：</p>
+
+<pre><code class="language-SQL">SELECT * FROM TableA
+LEFT OUTER JOIN TableB
+ON TableA.name = TableB.name
+WHERE TableB.id IS null
+</code></pre>
+
+<p>结果集：</p>
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>id</th>
+<th>name</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2</td>
+<td>Monkey</td>
+<td>null</td>
+<td>null</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Spaghetti</td>
+<td>null</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+
+<p><img width="400" height="400" src="http://codelog.me/img/2017-04/left-join-2.png" /></p>
+
+<h2 id="4-right-join">4. RIGHT JOIN</h2>
+
+<p>RIGHT JOIN在某些数据库中称之为RIGHT OUTER JOIN, 与LEFT JOIN相反, 该关键字返回右表中所有符合条件的行, 并且如果左表有匹配的行则一并返回, 如果左表没找到匹配的行, 则与左表相关的结果列返回NULL。</p>
+
+<p>由于RIGHT JOIN的原理与LEFT JOIN大致相同， 这里就不再赘述。</p>
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  
+                  <li class="next">
+                      <a href="/2016/01/14/linux-package-management/" data-toggle="tooltip" data-placement="top" title="Linux包管理扫盲帖">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                            <a href="/tags/java" title="java">
+                                java
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/jboss" title="jboss">
+                                jboss
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/linux" title="linux">
+                                linux
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/shell" title="shell">
+                                shell
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/sql" title="sql">
+                                sql
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F" title="分布式">
+                                分布式
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E7%AE%97%E6%B3%95" title="算法">
+                                算法
+                            </a>
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="技术的本质" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:gdlujianhua@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/img/wechat_qrcode.png">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 技术的本质 , 2017
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+<script>
+    
+    var _baId = 'c63aaee580fed094fa8dae6b8b6999e6';
+
+    
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+</body>
+</html>

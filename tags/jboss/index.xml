@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Jboss on 技术的本质</title>
+    <link>http://codelog.me/tags/jboss/</link>
+    <description>Recent content in Jboss on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 15 Jan 2015 11:05:51 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/jboss/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Jboss AS7 类加载机制</title>
+      <link>http://codelog.me/2015/01/15/jboss-as7-class-loading/</link>
+      <pubDate>Thu, 15 Jan 2015 11:05:51 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/15/jboss-as7-class-loading/</guid>
+      <description>&lt;p&gt;相对于Jboss之前的版本，AS7的类加载机制完全不同，AS7的类加载是基于JBoss模块来设计，关于JBoss模块的介绍，可以看上一篇文章&lt;a href=&#34;http://m.com&#34; title=&#34;Jboss模块介绍&#34;&gt;Jboss模块介绍&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&#34;隐式模块依赖&#34;&gt;隐式模块依赖&lt;/h1&gt;
+
+&lt;p&gt;当你部署一个应用到Jboss容器的时候，有些依赖是隐式被加载的，例如如果部署一个Java EE的应用，包含EJBs，因为EJBs需要用到Javax.ejb.* 的包和其他一些Java EE API 相关包，包含这些包的Jar已经预先被制作成Module并且默认包含在容器里头作为JBoss AS的一部分，那么这些Jar的模块将会被自动加载。&lt;/p&gt;
+
+&lt;p&gt;那么隐式模块依赖是什么时候被加载的呢？当一个应用部署到容器里头，会经过一条叫做“deployment processors”的链。这条链上的每个processor都有方法去检测这个应用是否需要隐式加载一些模块，如果是，就将相关的依赖加载进来。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Jboss AS7 模块介绍</title>
+      <link>http://codelog.me/2015/01/13/jboss-as7-module-introduce/</link>
+      <pubDate>Tue, 13 Jan 2015 16:27:00 +0000</pubDate>
+      
+      <guid>http://codelog.me/2015/01/13/jboss-as7-module-introduce/</guid>
+      <description>&lt;p&gt;相对于Jboss之前的版本，AS7的类加载机制完全不同，AS7的类加载是基于JBoss模块来设计的。&lt;/p&gt;
+
+&lt;p&gt;#什么是模块
+模块是classes和resources的集合，每一个模块对应着一个classloader。模块之间可以存在依赖关系，如果一个模块里面的Jar包需要用到另一个模块Jar包里面的类，那么需要显式声明模块依赖，否则模块与模块之间是不可见的。同样，如果部署一个应用到JBoss AS7容器，应用需要依赖模块，也要显式声明模块依赖。&lt;/p&gt;
+
+&lt;p&gt;如果要深入了解JBoss AS7模块加载的机制，可以看：&lt;a href=&#34;http://jaxenter.com/inside-the-jboss-as-7modularity-107386.html&#34; title=&#34;JBoss模块分析&#34;&gt;JBoss模块分析&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;#模块的好处
+1. 相同版本的Jar包不会被重复加载。
+2. 避免Jar包的版本冲突问题。
+3. 提供了更加高效的类加载机制。&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

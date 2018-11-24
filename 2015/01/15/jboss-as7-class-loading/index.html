@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><head>
+    <meta name="google-site-verification" content="" />
+    <meta name="baidu-site-verification" content="" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <meta name="description" content="接上一篇，本文将介绍Jboss AS7的类加载机制">
+    
+    <meta name="keyword"  content="华恒, 华恒的博客, 技术的本质, 互联网, Web, 分布式系统, 高可用, 数据库, Docker, Kubernetes, 微服务, Microservice">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>Jboss AS7 类加载机制-技术的本质 | CodeLog Blog</title>
+
+    <link rel="canonical" href="/2015/01/15/jboss-as7-class-loading/">
+
+    <link rel="stylesheet" href="/css/iDisqus.min.css"/>
+
+    
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    
+    <link rel="stylesheet" href="/css/hux-blog.min.css">
+
+    
+    <link rel="stylesheet" href="/css/syntax.css">
+
+    
+    <link rel="stylesheet" href="/css/zanshang.css">
+
+    
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    
+    <link rel="stylesheet" href="/css/highlight/styles/atom-one-light.css">
+
+    
+    <script src="/js/jquery.min.js"></script>
+
+    
+    <script src="/js/bootstrap.min.js"></script>
+
+    
+    <script src="/js/hux-blog.min.js"></script>
+
+    <script src="/css/highlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+</head>
+
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">技术的本质</a>
+        </div>
+
+        
+        
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">Home</a>
+                    </li>
+                    
+                    <li>
+                        <a href="/categories/tech">tech</a>
+                    </li>
+                    
+
+                    
+                </ul>
+            </div>
+        </div>
+        
+    </div>
+    
+</nav>
+<script>
+    
+    
+    
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        
+            $navbar.className = " ";
+            
+            setTimeout(function(){
+                
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+
+
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/post-bg-coffee.jpeg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                       
+                       <a class="tag" href="/tags/jboss" title="Jboss">
+                           Jboss
+                        </a>
+                        
+                    </div>
+                    <h1>Jboss AS7 类加载机制</h1>
+                    <h2 class="subheading">  &#34;Jboss AS7 类加载机制&#34;</h2>
+                    <span  class="meta">Posted by     &#34;华恒&#34; on Thursday, January 15, 2015
+                        
+                        <span id="/2015/01/15/jboss-as7-class-loading/" class="leancloud_visitors meta_data_item" data-flag-title="">
+    <span class="post-meta-item-icon">
+      <span class="octicon octicon-eye"></span> 
+    </span>
+    <i class="fa fa-eye"></i>
+    <span class="old-visitors-count" style="display: none;"></span>
+    <span class="leancloud-visitors-count"></span>
+</span>
+
+
+
+<script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+
+<script>
+	AV.initialize("1xUyXiB4JM5bdoQdAB9sQ2LO-gzGzoHsz", "sx2QciEmiQsoexELNH373Hcw");
+</script>
+
+<script type="text/javascript">
+function showTime(Counter) {
+    var query = new AV.Query(Counter);
+    var entries = [];
+    var $visitors = $(".leancloud_visitors");
+
+    $visitors.each(function() {
+        entries.push($(this).attr("id").trim());
+    });
+
+    query.containedIn('url', entries);
+    query.find()
+        .done(function(results) {
+            var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+            var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+
+            
+            
+            
+            
+
+            for (var i = 0; i < results.length; i++) {
+                var item = results[i];
+                var url = item.get('url');
+                var time = item.get('time');
+                var element = document.getElementById(url);
+
+                $(element).find(COUNT_CONTAINER_REF).text(time);
+            }
+            for (var i = 0; i < entries.length; i++) {
+                var url = entries[i];
+                var element = document.getElementById(url);
+                var countSpan = $(element).find(COUNT_CONTAINER_REF);
+                if (countSpan.text() == '') {
+                    var oldCountSpan = $(element).find(OLD_COUNT_CONTAINER_REF).text();
+                    if(oldCountSpan!=''){
+                        countSpan.text(0+parseInt(oldCountSpan));
+                    }else{
+                        countSpan.text(0);          
+                    }
+                }
+            }
+        })
+        .fail(function(object, error) {
+            console.log("Error: " + error.code + " " + error.message);
+        });
+}
+
+function addCount(Counter) {
+    var $visitors = $(".leancloud_visitors");
+    var url = $visitors.attr('id').trim();
+    var title = $visitors.attr('data-flag-title').trim();
+    var query = new AV.Query(Counter);
+
+    query.equalTo("url", url);
+    query.find({
+        success: function(results) {
+            if (results.length > 0) {
+                var counter = results[0];
+                counter.fetchWhenSave(true);
+                counter.increment("time");
+                counter.save(null, {
+                    success: function(counter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(counter.get('time'));
+                    },
+                    error: function(counter, error) {
+                        console.log('Failed to save Visitor num, with error message: ' + error.message);
+                    }
+                });
+            } else {
+                var newcounter = new Counter();
+                 
+                var acl = new AV.ACL();
+                acl.setPublicReadAccess(true);
+                acl.setPublicWriteAccess(true);
+                newcounter.setACL(acl);
+                 
+                newcounter.set("title", title);
+                newcounter.set("url", url);
+                var OLD_COUNT_CONTAINER_REF = '.old-visitors-count';
+                var $element = $(document.getElementById(url));
+                var oldCountSpan = $element.find(OLD_COUNT_CONTAINER_REF).text();
+                if(oldCountSpan!=''){
+                    newcounter.set("time", parseInt(oldCountSpan)+1);
+                }else{
+ 	                    newcounter.set("time",  1);
+                }
+                newcounter.save(null, {
+                    success: function(newcounter) {
+                        var $element = $(document.getElementById(url));
+                        $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                    },
+                    error: function(newcounter, error) {
+                        console.log('Failed to create');
+                    }
+                });
+            }
+        },
+        error: function(error) {
+            console.log('Error:' + error.code + " " + error.message);
+        }
+    });
+}
+$(function() {
+    var Counter = AV.Object.extend("Counter");
+    
+    
+    if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+    } else {
+        showTime(Counter);
+    }
+});
+</script>
+
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+
+
+
+<article>
+    <div class="container">
+        <div class="row">
+
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+        		
+                        <header>
+                        <h2>TOC</h2>
+                        </header>
+                        <nav id="TableOfContents">
+<ul>
+<li><a href="#隐式模块依赖">隐式模块依赖</a></li>
+<li><a href="#类加载的优先级">类加载的优先级</a></li>
+<li><a href="#war包的类加载">WAR包的类加载</a></li>
+<li><a href="#ear包的类加载">EAR包的类加载</a></li>
+</ul>
+</nav>
+        		
+        		<p>相对于Jboss之前的版本，AS7的类加载机制完全不同，AS7的类加载是基于JBoss模块来设计，关于JBoss模块的介绍，可以看上一篇文章<a href="http://m.com" title="Jboss模块介绍">Jboss模块介绍</a></p>
+
+<h1 id="隐式模块依赖">隐式模块依赖</h1>
+
+<p>当你部署一个应用到Jboss容器的时候，有些依赖是隐式被加载的，例如如果部署一个Java EE的应用，包含EJBs，因为EJBs需要用到Javax.ejb.* 的包和其他一些Java EE API 相关包，包含这些包的Jar已经预先被制作成Module并且默认包含在容器里头作为JBoss AS的一部分，那么这些Jar的模块将会被自动加载。</p>
+
+<p>那么隐式模块依赖是什么时候被加载的呢？当一个应用部署到容器里头，会经过一条叫做“deployment processors”的链。这条链上的每个processor都有方法去检测这个应用是否需要隐式加载一些模块，如果是，就将相关的依赖加载进来。</p>
+
+<p>检测手段可以有多种，譬如Annotation。如果一个类添加了@Stateless声明，那么容器就知道，这是一个EJB的类。</p>
+
+<p>Jboss AS7隐式加载的模块列表看这里：<a href="https://docs.jboss.org/author/display/AS7/Implicit+module+dependencies+for+deployments" title="隐式加载的模块">隐式加载的模块</a></p>
+
+<h1 id="类加载的优先级">类加载的优先级</h1>
+
+<p>类加载的先后顺序是为了避免类冲突，以下顺序按优先级从高到低排列：</p>
+
+<ol>
+<li>系统依赖 - 就是上面说的隐式依赖。</li>
+<li>用户依赖 - jboss-deployment-structure.xml里头定义的依赖；Manifest文件里通过Dependencies定义的依赖；Class-Path定义的依赖都属于用户依赖。</li>
+<li>本地资源 - 就是打包在应用里头的类，包括WEB-INF/classes底下的类文件，WEB-INF/lib底下的Jar包</li>
+<li>内部部署依赖 - 一个部署依赖于另一个部署；譬如一个EAR依赖另一个应用部署，EAR包lib底下的类等。</li>
+</ol>
+
+<h1 id="war包的类加载">WAR包的类加载</h1>
+
+<p>一个WAR包作为一个单独的module，因此一个WAR包对应一个单独的class loader。</p>
+
+<h1 id="ear包的类加载">EAR包的类加载</h1>
+
+<p>EAR被看作为多module的部署。一般来说，EAR/lib这个文件夹会作为一个module，每一个WAR 或者EJB Jar包作为一个独立的module看待。子模块（WARs和EJB-Jars）一般来说会依赖父模块（EAR/lib），因此子模块可以访问EAR/lib底下的Jar，但子模块之间就不一定可见。可以通过ear-subdeployments-isolated来设置可见性。</p>
+
+<pre><code class="language-xml">&lt;subsystem xmlns=&quot;urn:jboss:domain:ee:1.0&quot; &gt;            
+  &lt;ear-subdeployments-isolated&gt;false&lt;/ear-subdeployments-isolated&gt;
+&lt;/subsystem&gt;
+</code></pre>
+
+<p>默认值是false的，因此一个子模块可以访问另一个子模块的类。</p>
+
+<p>譬如有下面的EAR包结构：</p>
+
+<pre><code>myapp.ear
+ |
+ |--- web.war
+ |
+ |--- ejb1.jar
+ |
+ |--- ejb2.jar
+</code></pre>
+
+<p>如果ear-subdeployments-isolated设置为false，那么web.war就可以访问ejb1.jar或者ejb2.jar里面的类，同理，ejb1.jar 跟ejb2.jar也是相互可见的。但是这个参数对具有单独类加载器的子部署是不生效的，譬如说EAR中的WAR包，因为每个WAR包是一个字部署，拥有独立的类加载器，因此WAR包之间的类是不可见的。同理，EAR底下Jar包的类也不能访问WAR包里的类。</p>
+        
+                
+        
+              <hr>
+              <ul class="pager">
+                  
+                  <li class="previous">
+                      <a href="/2015/01/20/java-string-intern/" data-toggle="tooltip" data-placement="top" title="深入理解Java String.intern() 内存模型">&larr; Previous Post</a>
+                  </li>
+                  
+                  
+                  <li class="next">
+                      <a href="/2015/01/13/jboss-as7-module-introduce/" data-toggle="tooltip" data-placement="top" title="Jboss AS7 模块介绍">Next Post &rarr;</a>
+                  </li>
+                  
+              </ul>
+  
+              
+<div id="disqus-comment"></div>
+
+
+
+            </div>
+            
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+                     
+                    
+                        
+                            <a href="/tags/java" title="java">
+                                java
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/jboss" title="jboss">
+                                jboss
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/linux" title="linux">
+                                linux
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/shell" title="shell">
+                                shell
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/sql" title="sql">
+                                sql
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F" title="分布式">
+                                分布式
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/%E7%AE%97%E6%B3%95" title="算法">
+                                算法
+                            </a>
+                        
+                    
+                    </div>
+                </section>
+
+                
+                <hr>
+                <h5>FRIENDS</h5>
+                <ul class="list-inline">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                   
+                   <li>
+                       <a href="" rel="alternate" type="application/rss+xml" title="技术的本质" >
+                           <span class="fa-stack fa-lg">
+                               <i class="fa fa-circle fa-stack-2x"></i>
+                               <i class="fa fa-rss fa-stack-1x fa-inverse"></i>
+                           </span>
+                       </a>
+                   </li>
+                   
+                    
+                    <li>
+                        <a href="mailto:gdlujianhua@gmail.com">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-envelope fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                    
+                    
+
+                    
+
+		    
+                    
+                    <li>
+                        <a target="_blank" href="/img/wechat_qrcode.png">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-wechat fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+		    
+                    
+                    
+                </ul>
+		<p class="copyright text-muted">
+                    Copyright &copy; 技术的本质 , 2015
+                    <br>
+                    <a href="https://themes.gohugo.io/hugo-theme-cleanwhite">CleanWhite Hugo Theme</a> by <a href="https://zhaohuabing.com">Huabing</a> |
+                    <iframe
+                        style="margin-left: 2px; margin-bottom:-5px;"
+                        frameborder="0" scrolling="0" width="100px" height="20px"
+                        src="https://ghbtns.com/github-btn.html?user=zhaohuabing&repo=hugo-theme-cleanwhite&type=star&count=true" >
+                    </iframe>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+
+
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+
+
+
+
+
+<script>
+    
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+
+<script>
+    async("https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+
+
+
+<script>
+    
+    var _baId = 'c63aaee580fed094fa8dae6b8b6999e6';
+
+    
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
+
+
+
+</body>
+</html>

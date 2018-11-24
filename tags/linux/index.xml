@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on 技术的本质</title>
+    <link>http://codelog.me/tags/linux/</link>
+    <description>Recent content in Linux on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 14 Jan 2016 23:43:47 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Linux包管理扫盲帖</title>
+      <link>http://codelog.me/2016/01/14/linux-package-management/</link>
+      <pubDate>Thu, 14 Jan 2016 23:43:47 +0000</pubDate>
+      
+      <guid>http://codelog.me/2016/01/14/linux-package-management/</guid>
+      <description>&lt;p&gt;&lt;img src=&#34;http://codelog.me/img/2016-01-14-linux-package-management/linux-package-management.png&#34;&gt;&lt;/p&gt;
+
+&lt;p&gt;简单来说，Linux &lt;strong&gt;包管理系统（package management）&lt;/strong&gt; 指的是在Linux系统上安装删除或者更新软件的一种工具。不同Linux发行版本的应用软件打包格式各不相同, 譬如：Debian系列的Linux安装包格式为: *.deb; CentOS的为: *.rpm; openSUSE也是: *.rpm。 由于不同Linux发行版本安装包格式的差异性，也导致了不同Linix发行版之间包管理工具不尽相同。&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>deb包安装目录详解</title>
+      <link>http://codelog.me/2016/01/13/where-the-package-installed-in-linux/</link>
+      <pubDate>Wed, 13 Jan 2016 00:13:58 +0000</pubDate>
+      
+      <guid>http://codelog.me/2016/01/13/where-the-package-installed-in-linux/</guid>
+      <description>&lt;p&gt;大家都知道在Windows系统下安装一个软件，一般情况下该软件包的绝大部分文件都保存在安装目录里，但刚开始在Linux上安装了一个软件包，往往心中会有一个疑问，&lt;strong&gt;究竟软件包的文件被保存到在里？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;其实在Linux里安装软件包，系统会将软件包里不同类型的文件拷贝到不同的目录。如果你是用Debian系列的Linux系统，可以通过以下命令找出一个软件包不同类型文件所在的目录，举个例子，要查看nodejs的所有文件的分布情况：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-shell&#34;&gt;# dpkg -L nodejs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;输出如下：&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

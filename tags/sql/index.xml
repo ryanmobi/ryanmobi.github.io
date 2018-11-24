@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Sql on 技术的本质</title>
+    <link>http://codelog.me/tags/sql/</link>
+    <description>Recent content in Sql on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Wed, 12 Apr 2017 23:15:36 +0000</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/sql/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>图说SQL Join</title>
+      <link>http://codelog.me/2017/04/12/sql-join-in-detail/</link>
+      <pubDate>Wed, 12 Apr 2017 23:15:36 +0000</pubDate>
+      
+      <guid>http://codelog.me/2017/04/12/sql-join-in-detail/</guid>
+      <description>&lt;p&gt;如果你也曾经被SQL语言中各种Join操作：Left Join, Right Join, Inner Join等搞晕了头，那么这篇文章比较适合你。本文通过维恩图演示各种Join语句的执行效果，简单直白容易记忆。&lt;a href=&#34;https://blog.codinghorror.com/a-visual-explanation-of-sql-joins/&#34;&gt;原文见&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;假如有两张表 &lt;strong&gt;Table A&lt;/strong&gt; 和 &lt;strong&gt;Table B&lt;/strong&gt;, 表数据如下:
+Table A:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;id&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Pirate&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Monkey&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Ninja&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Spaghetti&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Table B:&lt;/p&gt;
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;id&lt;/th&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;Rutabaga&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;td&gt;Pirate&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;td&gt;Darth Vader&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;td&gt;Ninja&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;下面我们来看看各种Join的执行效果&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

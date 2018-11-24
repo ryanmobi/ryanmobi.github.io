@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Shell on 技术的本质</title>
+    <link>http://codelog.me/tags/shell/</link>
+    <description>Recent content in Shell on 技术的本质</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 23 Jan 2014 23:53:51 +0800</lastBuildDate>
+    
+	<atom:link href="http://codelog.me/tags/shell/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>sed快速入门</title>
+      <link>http://codelog.me/2014/01/23/sed-quick-start/</link>
+      <pubDate>Thu, 23 Jan 2014 23:53:51 +0800</pubDate>
+      
+      <guid>http://codelog.me/2014/01/23/sed-quick-start/</guid>
+      <description>sed与awk堪称文本流处理神器，本文提供了sed命令的快速入门参考：
+删除命令 删除第N行 sed 3d abc.txt  该命令会删除第三行数据
+隔行删除 sed &#39;1~2d&#39; abc.txt sed &#39;2~2d&#39; abc.txt  第一个命令会删除奇数行数据，第二个命令会删除偶数行数据。
+删除从N行开始到M行的数据 sed &#39;5,11d&#39; abc.txt  删除第五行到第十一行的数据。
+删除最后一行数据 sed &#39;$d&#39; abc.txt  删除符合条件的行 sed /unix/d abc.txt  该命令会删除所有包含unix关键字的行
+删除符合条件的行以及紧跟着的N行 sed &#39;/unix/,+3d&#39; abc.txt  该命令会删除包含unix关键字的行以及该行往下3行
+删除符合条件的行到最后的行 sed &#39;/unix/,$d&#39; abc.txt  该命令会删除包含unix关键字的行以及该行往下到文件结尾的所有行
+删除所有空行 sed &#39;/^$/d&#39; abc.txt  该命令会删除abc.txt所有空白行
+删除所有注释行 我们这里假设通过符号 # 来进行注释
+sed &#39;/#.*/d&#39; abc.txt  该命令会删除所有注释行
+替换命令 s 代表替换符, / 是定界符
+单个替换 sed &#39;s/old/new/&#39;  该命令会将第一个&amp;rsquo;old&amp;rsquo;替换成&amp;rsquo;new&amp;rsquo;</description>
+    </item>
+    
+  </channel>
+</rss>
